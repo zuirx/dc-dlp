@@ -467,6 +467,10 @@ if __name__ == '__main__':
     bot_token = os.getenv("BOT_TOKEN")
     autostart_lang = os.getenv("AUTOSTART_LANG")
 
+    lang_map = {
+        '1': 'en', '2': 'pt', '3': 'fr', '4': 'es', '5': 'ru', '6': 'cn', '7': 'ar'
+    }
+
     if not bot_token:
         raise ValueError("BOT_TOKEN is not set. \nCreate a .env file, and paste your bot token like 'BOT_TOKEN = \"123456...\"'.")
 
@@ -480,9 +484,6 @@ if __name__ == '__main__':
         print("Select language:")
         print("1 - English (en)\n2 - Português (pt)\n3 - Français (fr)\n4 - Español (es)\n5 - Русский (ru)\n6 - 中文 (cn)\n7 - العربية (ar)")
         choice = input("> ")
-        lang_map = {
-            '1': 'en', '2': 'pt', '3': 'fr', '4': 'es', '5': 'ru', '6': 'cn', '7': 'ar'
-        }
         lang_code = lang_map.get(choice, 'en')
         txts.update(all_langs[lang_code])
     
