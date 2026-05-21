@@ -11,7 +11,7 @@ discord bot for yt-dlp
 - install python (recommended 3.11.*)
 - run those commands:
 ```bash
-git clone https://github.com/jabirito/dc-dlp.git
+git clone https://github.com/zuirx/dc-dlp.git
 cd dc-dlp
 python -m pip install -r requirements.txt
 ```
