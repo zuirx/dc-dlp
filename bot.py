@@ -9,6 +9,8 @@ bot = commands.Bot(command_prefix="!j ", intents=intents)
 
 PP_PATH = os.path.dirname(os.path.abspath(__file__))
 
+YTDL_OPTS = {}
+
 queue = []              # display strings
 queue_to_play = []      # video IDs in play order
 finished_at = {}        # vid_id -> datetime when it stopped playing (for cleanup)
@@ -21,6 +23,7 @@ async def download_music(vid_id):
         os.remove(music_path)
 
     ydl_opts = {
+        **YTDL_OPTS,
         'format': 'bestaudio/best',
         'outtmpl': os.path.join(PP_PATH, f"music{vid_id}.%(ext)s"),
         'postprocessors': [{
@@ -46,6 +49,7 @@ async def download_music_url(file_id, url):
         os.remove(music_path)
 
     ydl_opts = {
+        **YTDL_OPTS,
         'format': 'bestaudio/best',
         'outtmpl': os.path.join(PP_PATH, f"music{file_id}.%(ext)s"),
         'postprocessors': [{
@@ -125,7 +129,7 @@ async def howto(ctx):
 async def playlist(ctx, url: str):
     await ctx.send(txts['extracting_playlist'])
 
-    ydl_opts = {"quiet": True, "extract_flat": True}
+    ydl_opts = {**YTDL_OPTS, "quiet": True}
     loop = asyncio.get_event_loop()
 
     def fetch():
@@ -178,7 +182,7 @@ async def ytlink(ctx, url: str):
     loop = asyncio.get_event_loop()
 
     def fetch():
-        with yt_dlp.YoutubeDL({"quiet": True, "extract_flat": True}) as ydl:
+        with yt_dlp.YoutubeDL({**YTDL_OPTS,"quiet": True}) as ydl:
             return ydl.extract_info(url, download=False)
 
     try:
@@ -358,7 +362,7 @@ async def list(ctx):
 async def yt(ctx, *, arg):
     await ctx.send(f'{txts["searching"]}: "{arg}" ...')
 
-    ydl_opts = {"quiet": True, "extract_flat": True}
+    ydl_opts = {**YTDL_OPTS, "quiet": True, "extract_flat": True}
     lista_pesq = []
 
     loop = asyncio.get_event_loop()
@@ -464,8 +468,11 @@ if __name__ == '__main__':
 
     load_dotenv()
     
-    bot_token = os.getenv("BOT_TOKEN")
-    autostart_lang = os.getenv("AUTOSTART_LANG")
+    bot_token = os.getenv("BOT_TOKEN") or None
+    autostart_lang = os.getenv("AUTOSTART_LANG") or 0
+    jsrun = os.getenv("JSRUNTIME") or ''
+    cookies = os.getenv("COOKIES") or 0
+    verbose = os.getenv("VERBOSE") or 0
 
     lang_map = {
         '1': 'en', '2': 'pt', '3': 'fr', '4': 'es', '5': 'ru', '6': 'cn', '7': 'ar'
@@ -486,5 +493,17 @@ if __name__ == '__main__':
         choice = input("> ")
         lang_code = lang_map.get(choice, 'en')
         txts.update(all_langs[lang_code])
+
+    if verbose:
+        YTDL_OPTS["verbose"] = True
+
+    if jsrun:
+        YTDL_OPTS["js_runtimes"] = {"node": {"path": jsrun}}
+        YTDL_OPTS["extractor_args"] = {"youtube": {"player_client": ["web"]}}
+        YTDL_OPTS["remote_components"] = {'ejs:github'}
+
+    if cookies:
+        YTDL_OPTS["cookiesfrombrowser"] = (cookies,)
     
+    print(YTDL_OPTS)
     bot.run(bot_token)
