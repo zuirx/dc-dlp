@@ -103,7 +103,7 @@ async def play_next(vc):
         if queue_to_play:
             asyncio.run_coroutine_threadsafe(play_next(vc), bot.loop)
 
-    vc.play(discord.FFmpegPCMAudio(music_path), after=after_playing)
+    vc.play(discord.FFmpegOpusAudio(music_path, before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"), after=after_playing)
 
 
 @bot.command()
@@ -503,7 +503,11 @@ if __name__ == '__main__':
         YTDL_OPTS["remote_components"] = {'ejs:github'}
 
     if cookies:
-        YTDL_OPTS["cookiesfrombrowser"] = (cookies,)
+        # If it looks like a file path (contains separator or .txt), use cookiefile
+        if os.path.sep in cookies or cookies.endswith('.txt'):
+            YTDL_OPTS["cookiefile"] = cookies
+        else:
+            YTDL_OPTS["cookiesfrombrowser"] = (cookies,)
     
     print(YTDL_OPTS)
     bot.run(bot_token)
