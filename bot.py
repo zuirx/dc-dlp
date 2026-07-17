@@ -9,6 +9,51 @@ bot = commands.Bot(command_prefix="!j ", intents=intents)
 
 PP_PATH = os.path.dirname(os.path.abspath(__file__))
 
+
+def _extract_chrome_cookies(cookie_file=None):
+    """
+    Extract YouTube cookies from Google Chrome and write a Netscape-format file.
+    Returns the path to the cookies file, or None on failure.
+    """
+    if cookie_file is None:
+        cookie_file = os.path.join(PP_PATH, "cookies.txt")
+
+    try:
+        import browser_cookie3
+    except ImportError:
+        print("[cookies] browser_cookie3 not installed. Run: pip install browser-cookie3")
+        return None
+
+    # Try multiple Chrome variants
+    browsers = []
+    for name in ("chrome", "chromium", "chrome-beta", "chrome-dev", "brave"):
+        try:
+            getattr(browser_cookie3, name)(cookie_file=cookie_file)
+            browsers.append(name)
+            break
+        except Exception:
+            continue
+
+    if not browsers:
+        print("[cookies] Could not access any Chrome-based browser cookies.")
+        print("[cookies] On Linux, make sure gnome-keyring is unlocked, or export cookies.txt manually.")
+        return None
+
+    # browser_cookie3 already wrote the file — verify it has youtube cookies
+    if not os.path.exists(cookie_file) or os.path.getsize(cookie_file) < 100:
+        print("[cookies] Extracted cookies file is empty or too small.")
+        return None
+
+    with open(cookie_file, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    if ".youtube.com" not in content:
+        print("[cookies] WARNING: No YouTube cookies found in Chrome. Are you logged into YouTube?")
+        # still return the file — it may have other useful cookies
+
+    print(f"[cookies] Extracted Chrome cookies → {cookie_file}  ({len(content)} bytes)")
+    return cookie_file
+
 YTDL_OPTS = {
     "http_headers": {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
@@ -603,11 +648,16 @@ if __name__ == '__main__':
             YTDL_OPTS["cookiefile"] = cookies
             print(f"[cookies] using cookiefile: {cookies}")
         else:
-            YTDL_OPTS["cookiesfrombrowser"] = (cookies,)
-            print(f"[cookies] using browser: {cookies}")
-            if os.name == "posix":
-                print("[cookies] WARNING: cookiesfrombrowser often fails on Linux. "
-                      "Export cookies to a txt file and set COOKIES=/path/to/cookies.txt instead.")
+            # Browser name given (e.g. "chrome") — extract cookies to a file first.
+            # This is more reliable than cookiesfrombrowser, especially on Linux.
+            print(f"[cookies] extracting from browser: {cookies} ...")
+            extracted = _extract_chrome_cookies()
+            if extracted:
+                YTDL_OPTS["cookiefile"] = extracted
+            else:
+                # fallback: let yt-dlp try cookiesfrombrowser directly
+                print(f"[cookies] extraction failed, falling back to cookiesfrombrowser")
+                YTDL_OPTS["cookiesfrombrowser"] = (cookies,)
     else:
         # fallback: look for cookies.txt in the bot directory
         default_cookies = os.path.join(PP_PATH, "cookies.txt")
@@ -615,8 +665,14 @@ if __name__ == '__main__':
             YTDL_OPTS["cookiefile"] = default_cookies
             print(f"[cookies] using default cookiefile: {default_cookies}")
         else:
-            print("[cookies] NONE — YouTube will likely block audio downloads. "
-                  "Export browser cookies to cookies.txt and place it next to bot.py.")
+            # try to extract from Chrome automatically
+            print("[cookies] no COOKIES set — trying Chrome extraction ...")
+            extracted = _extract_chrome_cookies()
+            if extracted:
+                YTDL_OPTS["cookiefile"] = extracted
+            else:
+                print("[cookies] NONE — YouTube will likely block audio downloads. "
+                      "Log into YouTube in Chrome and restart the bot, or place cookies.txt next to bot.py.")
     
     print(YTDL_OPTS)
     bot.run(bot_token)
