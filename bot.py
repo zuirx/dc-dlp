@@ -59,6 +59,12 @@ YTDL_OPTS = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
         "Accept-Language": "en-US,en;q=0.9",
     },
+    "extractor_args": {
+        "youtube": {
+            # android/ios first — they bypass SABR streaming that breaks the web client
+            "player_client": ["android", "ios", "web"],
+        }
+    },
 }
 
 queue = []              # display strings
@@ -639,7 +645,6 @@ if __name__ == '__main__':
 
     if jsrun:
         YTDL_OPTS["js_runtimes"] = {"node": {"path": jsrun}}
-        YTDL_OPTS["extractor_args"] = {"youtube": {"player_client": ["web"]}}
         YTDL_OPTS["remote_components"] = {'ejs:github'}
 
     if cookies:
