@@ -1,4 +1,4 @@
-import discord, yt_dlp, os, asyncio, hashlib, json
+import discord, yt_dlp, os, asyncio, hashlib, json, time
 from datetime import datetime, timedelta
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
@@ -17,7 +17,62 @@ finished_at = {}        # vid_id -> datetime when it stopped playing (for cleanu
 txts = {}               # language strings
 
 
-async def download_music(vid_id):
+def _make_progress_hook(status_msg, loop):
+    """Return a yt-dlp progress hook that edits *status_msg* with a progress bar."""
+    last_update = [0]  # mutable closure for throttle
+
+    def hook(d):
+        nonlocal last_update
+        status = d.get('status')
+
+        if status == 'finished':
+            # show 100% briefly before the function returns
+            asyncio.run_coroutine_threadsafe(
+                status_msg.edit(content=f"`[{'█' * 20}]` 100% · {txts['download_finished']}"),
+                loop,
+            )
+            return
+
+        if status != 'downloading':
+            return
+
+        now = time.time()
+        if now - last_update[0] < 1.2:  # throttle edits to avoid rate limits
+            return
+        last_update[0] = now
+
+        total = d.get('total_bytes') or d.get('total_bytes_estimate') or 0
+        downloaded = d.get('downloaded_bytes', 0)
+
+        if total > 0:
+            pct = downloaded / total
+            bar_len = 20
+            filled = int(bar_len * pct)
+            bar = '█' * filled + '░' * (bar_len - filled)
+            pct_str = f"{pct * 100:.0f}%"
+        else:
+            bar = '░' * 20
+            pct_str = "?%"
+
+        speed = d.get('speed') or 0
+        if speed:
+            if speed >= 1024 * 1024:
+                speed_str = f"{speed / 1024 / 1024:.1f} MB/s"
+            else:
+                speed_str = f"{speed / 1024:.0f} KB/s"
+        else:
+            speed_str = "? KB/s"
+
+        eta = d.get('eta') or 0
+        eta_str = f"{eta // 60}:{eta % 60:02d}" if eta else "?:??"
+
+        text = f"`[{bar}]` {pct_str}  ·  {speed_str}  ·  ETA {eta_str}"
+        asyncio.run_coroutine_threadsafe(status_msg.edit(content=text), loop)
+
+    return hook
+
+
+async def download_music(vid_id, status_msg=None):
     music_path = os.path.join(PP_PATH, f"music{vid_id}.mp3")
     if os.path.exists(music_path):
         os.remove(music_path)
@@ -36,6 +91,9 @@ async def download_music(vid_id):
 
     loop = asyncio.get_event_loop()
 
+    if status_msg:
+        ydl_opts['progress_hooks'] = [_make_progress_hook(status_msg, loop)]
+
     def run_dl():
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([f"https://youtube.com/watch?v={vid_id}"])
@@ -43,7 +101,7 @@ async def download_music(vid_id):
     await loop.run_in_executor(None, run_dl)
 
 
-async def download_music_url(file_id, url):
+async def download_music_url(file_id, url, status_msg=None):
     music_path = os.path.join(PP_PATH, f"music{file_id}.mp3")
     if os.path.exists(music_path):
         os.remove(music_path)
@@ -61,6 +119,9 @@ async def download_music_url(file_id, url):
     }
 
     loop = asyncio.get_event_loop()
+
+    if status_msg:
+        ydl_opts['progress_hooks'] = [_make_progress_hook(status_msg, loop)]
 
     def run_dl():
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -94,16 +155,48 @@ async def play_next(vc):
     if not os.path.exists(music_path):
         await download_music(vid_id)
 
+    print(f"[play_next] file={music_path}  size={os.path.getsize(music_path)}  vc_connected={vc.is_connected()}")
+
     def after_playing(error):
         if error:
-            print(f"{txts['error']}: {error}")
+            print(f"[after_playing] ERROR: {error}")
+        else:
+            print(f"[after_playing] finished normally: {vid_id}")
         finished_vid = queue_to_play.pop(0) if queue_to_play else None
         if finished_vid:
-            finished_at[finished_vid] = datetime.now()  # mark for cleanup
+            finished_at[finished_vid] = datetime.now()
         if queue_to_play:
             asyncio.run_coroutine_threadsafe(play_next(vc), bot.loop)
 
-    vc.play(discord.FFmpegOpusAudio(music_path, before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"), after=after_playing)
+    # -nostdin: prevent ffmpeg from reading stdin (can hang otherwise)
+    # -vn:      skip embedded album art / video streams in the mp3
+    vc.play(discord.FFmpegOpusAudio(music_path, before_options="-nostdin -vn"), after=after_playing)
+
+
+@bot.command()
+async def test(ctx):
+    """Play a 3-second 440 Hz test tone — verifies the audio pipeline."""
+    vc = ctx.voice_client
+    if not vc:
+        if ctx.author.voice:
+            vc = await ctx.author.voice.channel.connect()
+        else:
+            await ctx.send("Join a voice channel first.")
+            return
+
+    if vc.is_playing():
+        vc.stop()
+        await asyncio.sleep(0.3)
+
+    # generate a pure sine wave via ffmpeg's lavfi filter — no file needed
+    vc.play(
+        discord.FFmpegPCMAudio(
+            "sine=frequency=440:duration=3",
+            before_options="-f lavfi -nostdin",
+        ),
+        after=lambda e: print(f"[test] done, error={e}"),
+    )
+    await ctx.send("Playing test tone (440 Hz, 3 sec) — can you hear it?")
 
 
 @bot.command()
@@ -206,9 +299,8 @@ async def ytlink(ctx, url: str):
     queue.append(display)
     queue_to_play.append(vid_id)
 
-    await ctx.send(f"{txts['added']}: '{display}'\n{txts['downloading']}...")
-    await download_music(vid_id)
-    await ctx.send(txts['download_finished'])
+    status_msg = await ctx.send(f"{txts['added']}: '{display}'\n{txts['downloading']}...")
+    await download_music(vid_id, status_msg=status_msg)
 
     vc = ctx.voice_client
     if not vc and ctx.author.voice:
@@ -244,9 +336,8 @@ async def link(ctx, url: str):
     queue.append(display)
     queue_to_play.append(file_id)
 
-    await ctx.send(f"{txts['added']}: '{display}'\n{txts['downloading']}...")
-    await download_music_url(file_id, url)
-    await ctx.send(txts['download_finished'])
+    status_msg = await ctx.send(f"{txts['added']}: '{display}'\n{txts['downloading']}...")
+    await download_music_url(file_id, url, status_msg=status_msg)
 
     vc = ctx.voice_client
     if not vc and ctx.author.voice:
@@ -403,10 +494,9 @@ async def yt(ctx, *, arg):
 
         queue.append(vsel)
         queue_to_play.append(vid_id)
-        await ctx.send(f"{txts['downloading']}: '{vsel}'...")
+        status_msg = await ctx.send(f"{txts['downloading']}: '{vsel}'...")
 
-        await download_music(vid_id)
-        await ctx.send(txts['download_finished'])
+        await download_music(vid_id, status_msg=status_msg)
 
         # auto-play if in a voice channel and nothing is playing
         vc = ctx.voice_client
