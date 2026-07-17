@@ -9,7 +9,12 @@ bot = commands.Bot(command_prefix="!j ", intents=intents)
 
 PP_PATH = os.path.dirname(os.path.abspath(__file__))
 
-YTDL_OPTS = {}
+YTDL_OPTS = {
+    "http_headers": {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+        "Accept-Language": "en-US,en;q=0.9",
+    },
+}
 
 queue = []              # display strings
 queue_to_play = []      # video IDs in play order
@@ -596,8 +601,22 @@ if __name__ == '__main__':
         # If it looks like a file path (contains separator or .txt), use cookiefile
         if os.path.sep in cookies or cookies.endswith('.txt'):
             YTDL_OPTS["cookiefile"] = cookies
+            print(f"[cookies] using cookiefile: {cookies}")
         else:
             YTDL_OPTS["cookiesfrombrowser"] = (cookies,)
+            print(f"[cookies] using browser: {cookies}")
+            if os.name == "posix":
+                print("[cookies] WARNING: cookiesfrombrowser often fails on Linux. "
+                      "Export cookies to a txt file and set COOKIES=/path/to/cookies.txt instead.")
+    else:
+        # fallback: look for cookies.txt in the bot directory
+        default_cookies = os.path.join(PP_PATH, "cookies.txt")
+        if os.path.exists(default_cookies):
+            YTDL_OPTS["cookiefile"] = default_cookies
+            print(f"[cookies] using default cookiefile: {default_cookies}")
+        else:
+            print("[cookies] NONE — YouTube will likely block audio downloads. "
+                  "Export browser cookies to cookies.txt and place it next to bot.py.")
     
     print(YTDL_OPTS)
     bot.run(bot_token)
