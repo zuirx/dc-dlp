@@ -144,7 +144,8 @@ async def download_music(vid_id, status_msg=None):
         }],
         'quiet': True,
     }
-    # Removed cookie stripping so downloads don't fail with LOGIN_REQUIRED
+    # Use android/web clients to bypass SABR (which causes "Only images are available" on web alone)
+    ydl_opts['extractor_args'] = {'youtube': {'player_client': ['android', 'web']}}
 
     loop = asyncio.get_event_loop()
 
@@ -174,7 +175,8 @@ async def download_music_url(file_id, url, status_msg=None):
         }],
         'quiet': True,
     }
-    # Removed cookie stripping so downloads don't fail with LOGIN_REQUIRED
+    # Use android/web clients to bypass SABR (which causes "Only images are available" on web alone)
+    ydl_opts['extractor_args'] = {'youtube': {'player_client': ['android', 'web']}}
 
     loop = asyncio.get_event_loop()
 
