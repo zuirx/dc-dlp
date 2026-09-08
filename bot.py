@@ -144,10 +144,7 @@ async def download_music(vid_id, status_msg=None):
         }],
         'quiet': True,
     }
-    # Strip cookies so the android client doesn't skip — it bypasses SABR
-    ydl_opts.pop('cookiefile', None)
-    ydl_opts.pop('cookiesfrombrowser', None)
-    ydl_opts['extractor_args'] = {'youtube': {'player_client': ['android']}}
+    # Removed cookie stripping so downloads don't fail with LOGIN_REQUIRED
 
     loop = asyncio.get_event_loop()
 
@@ -177,10 +174,7 @@ async def download_music_url(file_id, url, status_msg=None):
         }],
         'quiet': True,
     }
-    # Strip cookies so the android client doesn't skip — it bypasses SABR
-    ydl_opts.pop('cookiefile', None)
-    ydl_opts.pop('cookiesfrombrowser', None)
-    ydl_opts['extractor_args'] = {'youtube': {'player_client': ['android']}}
+    # Removed cookie stripping so downloads don't fail with LOGIN_REQUIRED
 
     loop = asyncio.get_event_loop()
 
