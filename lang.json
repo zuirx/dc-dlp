@@ -9,7 +9,11 @@
     "downloading": "baixando",
     "download_finished": "download concluído",
     "skipping": "pulando",
-    "skip_commands": ["nenhum", "n", "pular"],
+    "skip_commands": [
+      "nenhum",
+      "n",
+      "pular"
+    ],
     "wrong_command": "comando errado",
     "extracting_playlist": "extraindo playlist",
     "error_extracting_playlist": "erro ao extrair playlist",
@@ -49,7 +53,16 @@
     "not_in_vc": "você não está em um canal de voz",
     "something_playing": "algo já esta sendo tocado no bot",
     "nothing_to_play": "nada para tocar",
-    "clear_queue": "fila limpa"
+    "clear_queue": "fila limpa",
+    "slash_lang": "define ou exibe o idioma permanente do bot (apenas admins/mods)",
+    "no_permission": "Apenas administradores ou moderadores podem alterar o idioma do bot.",
+    "lang_changed": "Idioma alterado com sucesso para {lang}! Salvo permanentemente.",
+    "current_lang": "Idioma atual",
+    "available_langs": "Idiomas disponíveis",
+    "invalid_lang": "Idioma inválido. Use um código ou número válido",
+    "lang_usage": "Use !j lang <código ou número> para alterar. Exemplo: !j lang pt ou !j lang 1\n*(Apenas administradores ou moderadores podem alterar)*",
+    "servers": "servidores",
+    "slash_servidores": "lista os servidores em que o bot está"
   },
   "en": {
     "empty_queue": "empty queue",
@@ -61,7 +74,11 @@
     "downloading": "downloading",
     "download_finished": "download finished",
     "skipping": "skipping",
-    "skip_commands": ["none", "n", "skip"],
+    "skip_commands": [
+      "none",
+      "n",
+      "skip"
+    ],
     "wrong_command": "wrong command",
     "extracting_playlist": "extracting playlist",
     "error_extracting_playlist": "error extracting playlist",
@@ -103,7 +120,14 @@
     "not_in_vc": "you are not in a voice channel",
     "something_playing": "something is already playing on the bot",
     "nothing_to_play": "nothing to play",
-    "clear_queue": "queue cleared"
+    "clear_queue": "queue cleared",
+    "slash_lang": "set or view the bot's permanent language (admins/mods only)",
+    "no_permission": "Only administrators or moderators can change the bot's language.",
+    "lang_changed": "Language successfully changed to {lang}! Saved permanently.",
+    "current_lang": "Current language",
+    "available_langs": "Available languages",
+    "invalid_lang": "Invalid language. Use a valid code or number",
+    "lang_usage": "Use !j lang <code or number> to change. Example: !j lang en or !j lang 2\n*(Only administrators or moderators can change)*"
   },
   "fr": {
     "empty_queue": "file d'attente vide",
@@ -115,7 +139,11 @@
     "downloading": "téléchargement en cours",
     "download_finished": "téléchargement terminé",
     "skipping": "saut en cours",
-    "skip_commands": ["aucun", "n", "sauter"],
+    "skip_commands": [
+      "aucun",
+      "n",
+      "sauter"
+    ],
     "wrong_command": "commande erronée",
     "extracting_playlist": "extraction de la playlist",
     "error_extracting_playlist": "erreur lors de l'extraction de la playlist",
@@ -157,7 +185,14 @@
     "not_in_vc": "vous n'êtes pas dans un salon vocal",
     "something_playing": "quelque chose est déjà en cours de lecture sur le bot",
     "nothing_to_play": "rien à jouer",
-    "clear_queue": "file nettoyée"
+    "clear_queue": "file nettoyée",
+    "slash_lang": "définit ou affiche la langue permanente du bot (admins/mods uniquement)",
+    "no_permission": "Seuls les administrateurs ou modérateurs peuvent modifier la langue du bot.",
+    "lang_changed": "Langue modifiée avec succès pour {lang} ! Enregistré définitivement.",
+    "current_lang": "Langue actuelle",
+    "available_langs": "Langues disponibles",
+    "invalid_lang": "Langue invalide. Utilisez un code ou un numéro valide",
+    "lang_usage": "Utilisez !j lang <code ou numéro> pour modifier. Exemple : !j lang fr ou !j lang 3\n*(Seuls les administrateurs ou modérateurs peuvent modifier)*"
   },
   "es": {
     "empty_queue": "cola vacía",
@@ -169,7 +204,11 @@
     "downloading": "descargando",
     "download_finished": "descarga finalizada",
     "skipping": "saltando",
-    "skip_commands": ["ninguno", "n", "saltar"],
+    "skip_commands": [
+      "ninguno",
+      "n",
+      "saltar"
+    ],
     "wrong_command": "comando incorrecto",
     "extracting_playlist": "extrayendo lista de reproducción",
     "error_extracting_playlist": "error al extraer la lista de reproducción",
@@ -211,7 +250,14 @@
     "not_in_vc": "no estás en un canal de voz",
     "something_playing": "algo ya se está reproduciendo en el bot",
     "nothing_to_play": "nada para reproducir",
-    "clear_queue": "cola limpia"
+    "clear_queue": "cola limpia",
+    "slash_lang": "define o muestra el idioma permanente del bot (solo admins/mods)",
+    "no_permission": "Solo los administradores o moderadores pueden cambiar el idioma del bot.",
+    "lang_changed": "¡Idioma cambiado con éxito a {lang}! Guardado permanentemente.",
+    "current_lang": "Idioma actual",
+    "available_langs": "Idiomas disponibles",
+    "invalid_lang": "Idioma inválido. Usa un código o número válido",
+    "lang_usage": "Usa !j lang <código o número> para cambiar. Ejemplo: !j lang es o !j lang 4\n*(Solo los administradores o moderadores pueden cambiar)*"
   },
   "ru": {
     "empty_queue": "очередь пуста",
@@ -223,7 +269,11 @@
     "downloading": "скачивание",
     "download_finished": "скачивание завершено",
     "skipping": "пропуск",
-    "skip_commands": ["нет", "н", "пропустить"],
+    "skip_commands": [
+      "нет",
+      "н",
+      "пропустить"
+    ],
     "wrong_command": "неверная команда",
     "extracting_playlist": "извлечение плейлиста",
     "error_extracting_playlist": "ошибка при извлечении плейлиста",
@@ -265,7 +315,14 @@
     "not_in_vc": "вы не в голосовом канале",
     "something_playing": "что-то уже играет на боте",
     "nothing_to_play": "нечего играть",
-    "clear_queue": "очередь очищена"
+    "clear_queue": "очередь очищена",
+    "slash_lang": "устанавливает или показывает постоянный язык бота (только для админов/модов)",
+    "no_permission": "Только администраторы или модераторы могут изменять язык бота.",
+    "lang_changed": "Язык успешно изменен на {lang}! Настройка сохранена навсегда.",
+    "current_lang": "Текущий язык",
+    "available_langs": "Доступные языки",
+    "invalid_lang": "Неверный язык. Используйте правильный код или номер",
+    "lang_usage": "Используйте !j lang <код или номер> для изменения. Пример: !j lang ru или !j lang 5\n*(Только администраторы или модераторы могут изменять)*"
   },
   "cn": {
     "empty_queue": "队列为空",
@@ -277,7 +334,11 @@
     "downloading": "正在下载",
     "download_finished": "下载完成",
     "skipping": "正在跳过",
-    "skip_commands": ["无", "n", "跳过"],
+    "skip_commands": [
+      "无",
+      "n",
+      "跳过"
+    ],
     "wrong_command": "错误命令",
     "extracting_playlist": "正在提取播放列表",
     "error_extracting_playlist": "提取播放列表错误",
@@ -319,7 +380,14 @@
     "not_in_vc": "您不在语音频道中",
     "something_playing": "机器人已经在播放内容",
     "nothing_to_play": "没有可播放的内容",
-    "clear_queue": "队列已清除"
+    "clear_queue": "队列已清除",
+    "slash_lang": "设置或查看机器人的永久语言（仅限管理员/版主）",
+    "no_permission": "只有管理员或版主可以更改机器人的语言。",
+    "lang_changed": "语言已成功更改为 {lang}！已永久保存。",
+    "current_lang": "当前语言",
+    "available_langs": "可用语言",
+    "invalid_lang": "语言无效。请使用有效的代码或编号",
+    "lang_usage": "使用 !j lang <代码或编号> 更改。例如：!j lang cn 或 !j lang 6\n*（仅限管理员或版主更改）*"
   },
   "ar": {
     "empty_queue": "قائمة الانتظار فارغة",
@@ -331,7 +399,11 @@
     "downloading": "جاري التحميل",
     "download_finished": "اكتمل التحميل",
     "skipping": "جاري التخطي",
-    "skip_commands": ["لا شيء", "n", "تخطي"],
+    "skip_commands": [
+      "لا شيء",
+      "n",
+      "تخطي"
+    ],
     "wrong_command": "أمر خاطئ",
     "extracting_playlist": "جاري استخراج قائمة التشغيل",
     "error_extracting_playlist": "خطأ في استخراج قائمة التشغيل",
@@ -373,6 +445,13 @@
     "not_in_vc": "أنت لست في قناة صوتية",
     "something_playing": "هناك شيء يعمل بالفعل على البوت",
     "nothing_to_play": "لا يوجد شيء للتشغيل",
-    "clear_queue": "تم مسح قائمة الانتظار"
+    "clear_queue": "تم مسح قائمة الانتظار",
+    "slash_lang": "تعيين أو عرض اللغة الدائمة للبوت (للمشرفين فقط)",
+    "no_permission": "يمكن للمشرفين أو المشرفين فقط تغيير لغة البوت.",
+    "lang_changed": "تم تغيير اللغة بنجاح إلى {lang}! تم الحفظ بشكل دائم.",
+    "current_lang": "اللغة الحالية",
+    "available_langs": "اللغات المتاحة",
+    "invalid_lang": "لغة غير صالحة. استخدم رمزًا أو رقمًا صالحًا",
+    "lang_usage": "استخدم !j lang <الرمز أو الرقم> للتغيير. مثال: !j lang ar أو !j lang 7\n*(يمكن للمشرفين فقط التغيير)*"
   }
 }

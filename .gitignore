@@ -180,3 +180,5 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 *.mp3
+settings.json
+cookies.txt
